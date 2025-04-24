@@ -1,0 +1,55 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2>Customer Wise Report</h2>
+  <form method="POST">
+    <div class="form-group">
+      <label>Select Customer:</label>
+      <select name="customer_id" required>
+        {% for customer in customers %}
+        <option value="{{ customer.id }}">{{ customer.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Generate Report</button>
+  </form>
+
+  {% if selected_customer %}
+  <div class="report-section">
+    <h3>Report for {{ selected_customer.name }}</h3>
+    <div class="customer-info">
+      <p>Address: {{ selected_customer.address }}</p>
+      <p>GST: {{ selected_customer.gst }}</p>
+    </div>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Item Name</th>
+          <th>Serial Number</th>
+          <th>Printer</th>
+          <th>Quantity</th>
+          <th>Serviced</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in results %}
+        <tr>
+          <td>{{ item.date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ item.item_name }}</td>
+          <td>{{ item.serial }}</td>
+          <td>{{ item.printer }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.serviced }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="6">No transactions found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

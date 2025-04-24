@@ -1,0 +1,119 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2>Customer Management</h2>
+  <form
+    method="POST"
+    action="{% if edit_customer %}{{ url_for('master_customer_edit', id=edit_customer.id) }}{% else %}{{ url_for('master_customer') }}{% endif %}"
+  >
+    <div class="form-group">
+      <label>Customer Name:</label>
+      <input
+        type="text"
+        name="name"
+        required
+        value="{{ edit_customer.name if edit_customer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Address Line 1:</label>
+      <input
+        type="text"
+        name="address_line1"
+        value="{{ edit_customer.address_line1 if edit_customer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Address Line 2:</label>
+      <input
+        type="text"
+        name="address_line2"
+        value="{{ edit_customer.address_line2 if edit_customer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>PIN Code:</label>
+      <input
+        type="text"
+        name="pincode"
+        value="{{ edit_customer.pincode if edit_customer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>City:</label>
+      <input
+        type="text"
+        name="city"
+        value="{{ edit_customer.city if edit_customer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>State:</label>
+      <input
+        type="text"
+        name="state"
+        value="{{ edit_customer.state if edit_customer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Phone Number:</label>
+      <input
+        type="text"
+        name="phone"
+        value="{{ edit_customer.phone if edit_customer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>GST Number:</label>
+      <input
+        type="text"
+        name="gst"
+        value="{{ edit_customer.gst if edit_customer else '' }}"
+      />
+    </div>
+    <button type="submit">
+      {{ 'Update' if edit_customer else 'Add Customer' }}
+    </button>
+    {% if edit_customer %}
+    <a href="{{ url_for('master_customer') }}"
+      ><button type="button">Cancel</button></a
+    >
+    {% endif %}
+  </form>
+
+  <h3>Existing Customers</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Addr1</th>
+        <th>Addr2</th>
+        <th>PIN</th>
+        <th>City</th>
+        <th>State</th>
+        <th>Phone</th>
+        <th>GST</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for c in customers %}
+      <tr>
+        <td>{{ c.id }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.address_line1 }}</td>
+        <td>{{ c.address_line2 }}</td>
+        <td>{{ c.pincode }}</td>
+        <td>{{ c.city }}</td>
+        <td>{{ c.state }}</td>
+        <td>{{ c.phone }}</td>
+        <td>{{ c.gst }}</td>
+        <td>
+          <a href="{{ url_for('master_customer_edit', id=c.id) }}">Edit</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

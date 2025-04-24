@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>GLIAL INTEGRATED SERVICES</title>
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/style.css') }}"
+    />
+  </head>
+  <body>
+    <header>
+      <h1>GLIAL INTEGRATED SERVICES</h1>
+      <nav>
+        <div class="dropdown">
+          <button class="dropbtn">Master ▼</button>
+          <div class="dropdown-content">
+            <a href="{{ url_for('master_printer') }}">Printer</a>
+            <a href="{{ url_for('master_item') }}">Item</a>
+            <a href="{{ url_for('master_customer') }}">Customer</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="dropbtn">Transaction ▼</button>
+          <div class="dropdown-content">
+            <a href="{{ url_for('transaction_new') }}">New</a>
+          </div>
+        </div>
+        <div class="dropdown">
+          <button class="dropbtn">Report ▼</button>
+          <div class="dropdown-content">
+            <a href="{{ url_for('report_customer_wise') }}">Customer Summary</a>
+            <a href="{{ url_for('report_monthly') }}">Monthly Summary</a>
+            <a href="{{ url_for('report_item_wise') }}">Item Summary</a>
+            <a href="{{ url_for('report_printer_summary') }}"
+              >Printer Summary</a
+            >
+          </div>
+        </div>
+      </nav>
+    </header>
+    <main>{% block content %}{% endblock %}</main>
+  </body>
+</html>

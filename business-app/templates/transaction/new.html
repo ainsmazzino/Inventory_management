@@ -1,0 +1,181 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>{% if edit_tx %}Edit Transaction #{{ edit_tx.id }}{% else %}New Transaction{% endif %}</h2>
+  <form method="POST" action="{% if edit_tx %}{{ url_for('transaction_edit', id=edit_tx.id) }}{% else %}{{ url_for('transaction_new') }}{% endif %}">
+    <div class="form-group">
+      <label>Customer:</label>
+      <select name="customer_id" required>
+        {% for c in customers %}
+          <option value="{{ c.id }}"
+            {% if edit_tx and edit_tx.customer_id==c.id %}selected{% endif %}>
+            {{ c.name }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>Installation Date:</label>
+      <input type="date" name="installation_date" required
+        value="{{ edit_tx.installation_date.strftime('%Y-%m-%d') if edit_tx else '' }}">
+    </div>
+
+    <div class="form-group">
+      <label>Printer:</label>
+      <select id="printer-select" name="printer_id" required>
+        <option value="">-- Select Printer --</option>
+        {% for p in printers %}
+          <option value="{{ p.id }}"
+            {% if edit_tx and edit_tx.printer_id==p.id %}selected{% endif %}>
+            {{ p.model }} ({{ p.serial }})
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div id="items-container">
+      {% if edit_tx %}
+        {% for it in edit_items %}
+          <div class="item-row">
+            <div class="form-group">
+              <label>Item:</label>
+              <select name="item_id" class="item-select" required></select>
+            </div>
+            <div class="form-group">
+              <label>Quantity:</label>
+              <input type="number" name="quantity" min="1" value="{{ it.quantity }}">
+            </div>
+            <div class="form-group">
+              <label>Serviced:</label>
+              <select name="serviced">
+                <option value="Yes" {% if it.serviced=='Yes' %}selected{% endif %}>Yes</option>
+                <option value="No" {% if it.serviced=='No' %}selected{% endif %}>No</option>
+              </select>
+            </div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="item-row">
+          <div class="form-group">
+            <label>Item:</label>
+            <select name="item_id" class="item-select" required></select>
+          </div>
+          <div class="form-group">
+            <label>Quantity:</label>
+            <input type="number" name="quantity" min="1" value="1">
+          </div>
+          <div class="form-group">
+            <label>Serviced:</label>
+            <select name="serviced">
+              <option value="Yes">Yes</option>
+              <option value="No">No</option>
+            </select>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+
+    <button type="button" onclick="addItemRow()" class="add-button">
+      Add Another Item
+    </button>
+    <button type="submit">{{ 'Update Transaction' if edit_tx else 'Save Transaction' }}</button>
+    {% if edit_tx %}
+      <a href="{{ url_for('transaction_new') }}"><button type="button">Cancel</button></a>
+    {% endif %}
+  </form>
+
+  <h3>Transaction History</h3>
+  <table class="transaction-table">
+    <thead>
+      <tr>
+        <th>ID</th><th>Date & Time</th><th>Customer</th><th>Printer</th>
+        <th>Items</th><th>Qty</th><th>Serviced</th><th>Installed</th><th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for tx in transactions %}
+      <tr>
+        <td>{{ tx.id }}</td>
+        <td>{{ tx.transaction_date.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>{{ tx.customer.name }}</td>
+        <td>{{ tx.printer.model }} ({{ tx.printer.serial }})</td>
+        <td>
+          {% for ti in tx.items %}
+            {{ ti.item.name }} ({{ ti.item.serial }})<br>
+          {% endfor %}
+        </td>
+        <td>
+          {% for ti in tx.items %}{{ ti.quantity }}<br>{% endfor %}
+        </td>
+        <td>
+          {% for ti in tx.items %}{{ ti.serviced }}<br>{% endfor %}
+        </td>
+        <td>{{ tx.installation_date.strftime('%Y-%m-%d') }}</td>
+        <td><a href="{{ url_for('transaction_edit', id=tx.id) }}">Edit</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+  async function fetchItems(printerId) {
+    const res = await fetch(`/api/items/${printerId}`);
+    const { items } = await res.json();
+    return items;
+  }
+  function populateSelect(sel, items) {
+    sel.innerHTML = items.map(i => `<option value="${i.id}">${i.name}</option>`).join('');
+  }
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const printerSelect = document.getElementById('printer-select');
+    function refreshAllItemSelects() {
+      document.querySelectorAll('.item-select')
+              .forEach(sel => sel.innerHTML = '');
+    }
+    printerSelect.addEventListener('change', async () => {
+      refreshAllItemSelects();
+      const pid = printerSelect.value;
+      if (!pid) return;
+      const items = await fetchItems(pid);
+      document.querySelectorAll('.item-select')
+              .forEach(sel => populateSelect(sel, items));
+    });
+    // if editing, trigger initial population:
+    {% if edit_tx %}
+      printerSelect.dispatchEvent(new Event('change'));
+    {% endif %}
+  });
+
+  function addItemRow() {
+    const container = document.getElementById('items-container');
+    const row = document.createElement('div');
+    row.className = 'item-row';
+    row.innerHTML = `
+      <div class="form-group">
+        <label>Item:</label>
+        <select name="item_id" class="item-select" required></select>
+      </div>
+      <div class="form-group">
+        <label>Quantity:</label>
+        <input type="number" name="quantity" min="1" value="1">
+      </div>
+      <div class="form-group">
+        <label>Serviced:</label>
+        <select name="serviced">
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+      </div>`;
+    container.appendChild(row);
+    const pid = document.getElementById('printer-select').value;
+    if (pid) {
+      fetchItems(pid).then(items =>
+        populateSelect(row.querySelector('.item-select'), items)
+      );
+    }
+  }
+</script>
+{% endblock %}

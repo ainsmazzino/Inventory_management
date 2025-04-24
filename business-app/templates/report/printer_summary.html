@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Printer Summary Report</h2>
+  <form method="POST">
+    <div class="form-group">
+      <label>Select Printer Model:</label>
+      <select name="model" required>
+        <option value="">-- Select Model --</option>
+        {% for m in models %}
+          <option value="{{ m }}" {% if selected_model==m %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Generate Report</button>
+  </form>
+
+  {% if selected_model %}
+  <div class="report-section">
+    <h3>Summary for Model: {{ selected_model }}</h3>
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th>Printer Serial</th>
+          <th>Item Name</th>
+          <th>Item Serial</th>
+          <th>Installation Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          <td>{{ row.customer }}</td>
+          <td>{{ row.printer_serial }}</td>
+          <td>{{ row.item_name }}</td>
+          <td>{{ row.item_serial }}</td>
+          <td>{{ row.installation_date.strftime('%Y-%m-%d') }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No records found</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

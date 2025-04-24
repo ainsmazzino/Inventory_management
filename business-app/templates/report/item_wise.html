@@ -1,0 +1,53 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2>Item Wise Report</h2>
+  <form method="POST">
+    <div class="form-group">
+      <label>Select Item:</label>
+      <select name="item_id" required>
+        {% for item in items %}
+        <option value="{{ item.id }}">
+          {{ item.name }} ({{ item.serial }})
+        </option>
+        {% endfor %}
+      </select>
+    </div>
+    <button type="submit">Generate Report</button>
+  </form>
+
+  {% if selected_item %}
+  <div class="report-section">
+    <h3>Report for {{ selected_item.name }} ({{ selected_item.serial }})</h3>
+    <div class="item-info">
+      <p>Printer: {{ selected_item.printer }}</p>
+      <p>Description: {{ selected_item.description }}</p>
+    </div>
+
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Customer</th>
+          <th>Qty</th>
+          <th>Serviced</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in results %}
+        <tr>
+          <td>{{ item.date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ item.customer }}</td>
+          <td>{{ item.quantity }}</td>
+          <td>{{ item.serviced }}</td>
+        </tr>
+        {% else %}
+        <tr>
+          <td colspan="4">No transactions found</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

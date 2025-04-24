@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+  <h2>Monthly Report (Range)</h2>
+  <form method="POST">
+    <div class="form-group">
+      <label>From Month:</label>
+      <select name="from_month" required>
+        {% for m in months %}
+          <option value="{{ m }}" {% if selected_range and selected_range[0].month==m %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+      </select>
+      <label>From Year:</label>
+      <select name="from_year" required>
+        {% for y in years %}
+          <option value="{{ y }}" {% if selected_range and selected_range[0].year==y %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label>To Month:</label>
+      <select name="to_month" required>
+        {% for m in months %}
+          <option value="{{ m }}" {% if selected_range and selected_range[1].month==m %}selected{% endif %}>{{ m }}</option>
+        {% endfor %}
+      </select>
+      <label>To Year:</label>
+      <select name="to_year" required>
+        {% for y in years %}
+          <option value="{{ y }}" {% if selected_range and selected_range[1].year==y %}selected{% endif %}>{{ y }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <button type="submit">Generate Report</button>
+  </form>
+
+  {% if selected_range %}
+  <div class="report-section">
+    <h3>Report from {{ selected_range[0].strftime('%Y-%m') }}
+                 to {{ selected_range[1].strftime('%Y-%m') }}</h3>
+    <table class="report-table">
+      <thead>
+        <tr>
+          <th>Date</th><th>Customer</th><th>Item Name</th>
+          <th>Serial</th><th>Printer</th><th>Qty</th><th>Serviced</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr>
+          <td>{{ row.date.strftime('%Y-%m-%d') }}</td>
+          <td>{{ row.customer }}</td>
+          <td>{{ row.item_name }}</td>
+          <td>{{ row.serial }}</td>
+          <td>{{ row.printer }}</td>
+          <td>{{ row.quantity }}</td>
+          <td>{{ row.serviced }}</td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7">No transactions found in this range</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h2>Printer Management</h2>
+  <form
+    method="POST"
+    action="{% if edit_printer %}{{ url_for('master_printer_edit', id=edit_printer.id) }}{% else %}{{ url_for('master_printer') }}{% endif %}"
+  >
+    <div class="form-group">
+      <label>Printer Model:</label>
+      <input
+        type="text"
+        name="model"
+        required
+        value="{{ edit_printer.model if edit_printer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Printer Serial:</label>
+      <input
+        type="text"
+        name="serial"
+        required
+        value="{{ edit_printer.serial if edit_printer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Control Unit:</label>
+      <input
+        type="text"
+        name="control_unit"
+        required
+        value="{{ edit_printer.control_unit if edit_printer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Control Unit Serial:</label>
+      <input
+        type="text"
+        name="control_unit_serial"
+        required
+        value="{{ edit_printer.control_unit_serial if edit_printer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Print Head:</label>
+      <input
+        type="text"
+        name="print_head"
+        required
+        value="{{ edit_printer.print_head if edit_printer else '' }}"
+      />
+    </div>
+    <div class="form-group">
+      <label>Print Head Serial:</label>
+      <input
+        type="text"
+        name="print_head_serial"
+        required
+        value="{{ edit_printer.print_head_serial if edit_printer else '' }}"
+      />
+    </div>
+    <button type="submit">
+      {{ 'Update' if edit_printer else 'Add Printer' }}
+    </button>
+    {% if edit_printer %}
+    <a href="{{ url_for('master_printer') }}"
+      ><button type="button">Cancel</button></a
+    >
+    {% endif %}
+  </form>
+
+  <h3>Existing Printers</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Model</th>
+        <th>Serial</th>
+        <th>Control Unit</th>
+        <th>CU Serial</th>
+        <th>Print Head</th>
+        <th>PH Serial</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for p in printers %}
+      <tr>
+        <td>{{ p.id }}</td>
+        <td>{{ p.model }}</td>
+        <td>{{ p.serial }}</td>
+        <td>{{ p.control_unit }}</td>
+        <td>{{ p.control_unit_serial }}</td>
+        <td>{{ p.print_head }}</td>
+        <td>{{ p.print_head_serial }}</td>
+        <td>
+          <a href="{{ url_for('master_printer_edit', id=p.id) }}">Edit</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
